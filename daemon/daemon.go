@@ -30,12 +30,15 @@ func NewDaemon(connstr string) (*daemon, error) {
 
 	yp.PopulateCreators(creators)
 
+	d.downloadPath = "download"
+
 	return d, nil
 }
 
 type daemon struct {
 	q *queue
 	b *db.DB
+	downloadPath string
 }
 
 func (d *daemon) ReloadCreators() error {
