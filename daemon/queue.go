@@ -3,21 +3,25 @@ package daemon
 import "sync"
 
 type queue struct {
-	tasks []task
+	tasks []Taskif
 	l     *sync.Mutex
 }
 
-func (q *queue) push(t task) {
-	q.l.Lock()
-	defer q.l.Unlock()
-	q.tasks = append(q.tasks, t)
+func newQueue() *queue {
+	return &queue{l: &sync.Mutex{}}
 }
 
-func (q *queue) pop() task {
+func (q *queue) push(t []Taskif) {
+	q.l.Lock()
+	defer q.l.Unlock()
+	q.tasks = append(q.tasks, t...)
+}
+
+func (q *queue) pop() Taskif {
 	q.l.Lock()
 	defer q.l.Unlock()
 	if len(q.tasks) == 0 {
-		return task{}
+		return nil
 	}
 
 	t := q.tasks[0]
