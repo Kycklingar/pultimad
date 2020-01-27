@@ -6,6 +6,7 @@ import (
 	"github.com/kycklingar/pultimad/config"
 	"github.com/kycklingar/pultimad/daemon"
 	"github.com/kycklingar/pultimad/yiff.party/db"
+	"github.com/kycklingar/pultimad/yiff.party/parser"
 )
 
 type Checker struct {
@@ -29,9 +30,9 @@ func (c *Checker) Init(conf config.Config) error {
 		return err
 	}
 
-	//if err = yp.LoadCreators(); err != nil {
-	//	return err
-	//}
+	if err = yp.LoadCreators(); err != nil {
+		return err
+	}
 
 	return nil
 }

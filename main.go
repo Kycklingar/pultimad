@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -23,11 +24,27 @@ func (c cfg) Default() config.Config {
 	return c
 }
 
-func main() {
-	var conf = new(cfg)
+func setupYP(conf config.Config) *yp.Checker {
+	var ypc = new(yp.Checker)
 
-	if len(os.Args) > 1 {
-		err := config.Write("config.json", conf.Default())
+	err := ypc.Init(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return ypc
+}
+
+func main() {
+	var conf cfg
+
+	var configFile = flag.String("cfg", "config.json", "Config file")
+	var configDefaults = flag.Bool("defaults", false, "Write a config file with default values")
+
+	flag.Parse()
+
+	if *configDefaults {
+		err := config.Write(*configFile, conf.Default())
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -35,30 +52,25 @@ func main() {
 		return
 	}
 
-	err := config.Load("config.json", conf)
+	conf = conf.Default().(cfg)
+	err := config.Load(*configFile, &conf)
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 
-	var ypc = new(yp.Checker)
-
-	err = ypc.Init(conf.YiffParty)
+	err = config.Write(*configFile, conf)
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 
 	daemon := daemon.NewDaemon()
 
+	ypc := setupYP(conf.YiffParty)
+
 	daemon.RegisterDomain("yiff.party", ypc, conf.SleepTime)
 
-	//log.Fatal(daemon.ReloadCreators())
-
 	quit := make(chan os.Signal, 1)
-
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT)
-
 	daemon.Loop(quit)
 
 }

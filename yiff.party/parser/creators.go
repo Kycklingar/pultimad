@@ -38,7 +38,6 @@ func LoadCreators() error {
 
 	Creators2 = make(map[int]string)
 
-	fmt.Println(m)
 	for _, c := range m.Creators {
 		fmt.Println(c.Id, c.Name)
 		Creators2[c.Id] = c.Name
