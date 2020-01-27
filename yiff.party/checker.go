@@ -1,26 +1,37 @@
 package yp
 
 import (
+	"log"
+
+	"github.com/kycklingar/pultimad/config"
 	"github.com/kycklingar/pultimad/daemon"
 	"github.com/kycklingar/pultimad/yiff.party/db"
-	yp "github.com/kycklingar/pultimad/yiff.party/parser"
 )
 
 type Checker struct {
 	db *db.DB
 }
 
-func (c *Checker) Init(config string) error {
-	var err error
+func (c *Checker) Init(conf config.Config) error {
+	cfg, ok := conf.(Config)
+	if !ok {
+		return config.ErrInvalid
+	}
 
-	c.db, err = db.Connect(config)
+	var err error
+	c.db, err = db.Connect(cfg.Connstr)
 	if err != nil {
 		return err
 	}
 
-	if err := yp.LoadCreators(); err != nil {
+	err = c.db.Ping()
+	if err != nil {
 		return err
 	}
+
+	//if err = yp.LoadCreators(); err != nil {
+	//	return err
+	//}
 
 	return nil
 }
@@ -28,6 +39,7 @@ func (c *Checker) Init(config string) error {
 func (c *Checker) Check() []daemon.Taskif {
 	creators, err := c.db.GetCreators(5)
 	if err != nil {
+		log.Println(err)
 		return nil
 	}
 
@@ -44,6 +56,7 @@ func (c *Checker) Check() []daemon.Taskif {
 
 	files, err := c.db.GetFiles(20)
 	if err != nil {
+		log.Println(err)
 		return nil
 	}
 

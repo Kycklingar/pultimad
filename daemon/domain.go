@@ -3,10 +3,12 @@ package daemon
 import (
 	"fmt"
 	"time"
+
+	"github.com/kycklingar/pultimad/config"
 )
 
 type Checker interface {
-	Init(string) error
+	Init(config.Config) error
 	Check() []Taskif
 	Quit()
 }

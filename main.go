@@ -1,29 +1,57 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/kycklingar/pultimad/config"
 	"github.com/kycklingar/pultimad/daemon"
 	yp "github.com/kycklingar/pultimad/yiff.party"
 )
 
+type cfg struct {
+	YiffParty yp.Config
+	SleepTime time.Duration
+}
+
+func (c cfg) Default() config.Config {
+	c.YiffParty = c.YiffParty.Default().(yp.Config)
+	c.SleepTime = time.Second * 2
+	return c
+}
+
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Connection string required")
-		os.Exit(1)
+	var conf = new(cfg)
+
+	if len(os.Args) > 1 {
+		err := config.Write("config.json", conf.Default())
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return
+	}
+
+	err := config.Load("config.json", conf)
+	if err != nil {
+		log.Fatal(err)
+		return
 	}
 
 	var ypc = new(yp.Checker)
 
-	ypc.Init(os.Args[1])
+	err = ypc.Init(conf.YiffParty)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 
 	daemon := daemon.NewDaemon()
 
-	daemon.RegisterDomain("yiff.party", ypc, time.Second*2)
+	daemon.RegisterDomain("yiff.party", ypc, conf.SleepTime)
 
 	//log.Fatal(daemon.ReloadCreators())
 

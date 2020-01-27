@@ -17,7 +17,9 @@ type dlTask struct {
 
 func (t dlTask) Domain() string { return ypDomain }
 
-func (t dlTask) Description() string { return fmt.Sprintf("%s - Downloading file %s", t.file.Creator, t.file.FileURL) }
+func (t dlTask) Description() string {
+	return fmt.Sprintf("%s - Downloading file %s", t.file.Creator, t.file.FileURL)
+}
 
 func (t dlTask) Do() []daemon.Taskif {
 	rc, err := t.file.Download()
