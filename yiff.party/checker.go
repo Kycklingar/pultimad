@@ -6,7 +6,7 @@ import (
 	"github.com/kycklingar/pultimad/config"
 	"github.com/kycklingar/pultimad/daemon"
 	"github.com/kycklingar/pultimad/yiff.party/db"
-	"github.com/kycklingar/pultimad/yiff.party/parser"
+	parser "github.com/kycklingar/pultimad/yiff.party/parser"
 )
 
 type Checker struct {
@@ -30,8 +30,13 @@ func (c *Checker) Init(conf config.Config) error {
 		return err
 	}
 
-	if err = yp.LoadCreators(); err != nil {
+	creators, err := parser.LoadCreators()
+	if err != nil {
 		return err
+	}
+
+	for _, creator := range creators {
+		c.db.StoreCreator(creator)
 	}
 
 	return nil

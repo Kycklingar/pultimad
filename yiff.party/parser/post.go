@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/net/html"
 )
@@ -13,6 +14,7 @@ type Post struct {
 	Creator     *Creator
 	ID          int
 	Title       string
+	PostTime    time.Time
 	Body        string
 	FileURL     string
 	Attachments []*url.URL
@@ -28,6 +30,12 @@ func parsePost(node *node) (*Post, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	err = post.parsePostTime(node)
+	if err != nil {
+		return nil, err
+	}
+
 	err = post.parseBody(node)
 	if err != nil {
 		return nil, err
@@ -51,13 +59,25 @@ func (p *Post) parseID(n *node) error {
 }
 
 func (p *Post) parseTitle(n *node) error {
-	cl := n.getClasses("card-reveal")
+	//cl := n.getClasses("card-reveal")
+	cl := n.getClasses("card-title")
+	if len(cl) <= 0 {
+		return errors.New("No title found")
+	}
+
+	//p.Title = cl[0].getFirstChildNode().n.FirstChild.Data
+	p.Title = cl[0].n.FirstChild.Data
+	return nil
+}
+
+func (p *Post) parsePostTime(n *node) error {
+	cl := n.getClasses("post-time")
 	if len(cl) <= 0 {
 		return nil
 	}
-
-	p.Title = cl[0].getFirstChildNode().n.FirstChild.Data
-	return nil
+	var err error
+	p.PostTime, err = time.Parse(time.RFC3339, cl[0].n.FirstChild.Data)
+	return err
 }
 
 func (p *Post) parseBody(n *node) error {

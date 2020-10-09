@@ -1,0 +1,11 @@
+<html>
+<head>
+</head>
+<body>
+	{{range .}}
+		{{.CID}} - {{.ID}}
+		<h1>{{.Title}}</h1>
+		<p>{{.Body | unescape}}</p>
+	{{end}}
+</body>
+</html>

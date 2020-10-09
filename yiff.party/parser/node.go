@@ -2,6 +2,7 @@ package yp
 
 import (
 	"golang.org/x/net/html"
+	"strings"
 )
 
 type node struct {
@@ -26,14 +27,40 @@ func (n *node) getFirstChildNode() *node {
 	return nil
 }
 
-func (n *node) getClasses(class string) []*node {
+func (n *node) getClassesS(class string) []*node {
 	var classes []*node
 
 	var r func(nn *node)
 	r = func(nn *node) {
 		if nn.n.Type == html.ElementNode && nn.getAttr("class") == class {
 			classes = append(classes, nn)
+
 		}
+		for c := nn.n.FirstChild; c != nil; c = c.NextSibling {
+			r(&node{*c})
+		}
+	}
+
+	r(n)
+
+	return classes
+}
+
+func (n *node) getClasses(class string) []*node {
+	var classes []*node
+
+	var r func(nn *node)
+	r = func(nn *node) {
+		if nn.n.Type == html.ElementNode {
+			for _, cl := range strings.Split(nn.getAttr("class"), " ") {
+				if cl == class {
+					classes = append(classes, nn)
+					break
+				}
+			}
+
+		}
+
 		for c := nn.n.FirstChild; c != nil; c = c.NextSibling {
 			r(&node{*c})
 		}

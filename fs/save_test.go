@@ -52,3 +52,24 @@ func TestWriteAndLink(t *testing.T) {
 		t.Fatalf("Sums not matching %s, %s, %s", sum1, sum2, sum3)
 	}
 }
+
+func TestWriteMaxLength(t *testing.T) {
+	StoragePath = ".test-storage"
+	tmpPath := "tmp-test"
+
+	var filename string
+
+	for i := 0; i < 240; i++ {
+		filename += "a"
+	}
+
+	filename += "EndOfTheFileName.txt"
+
+	var ss = strings.NewReader("Hello World!\n")
+
+	_, err := WriteAndLink(tmpPath+"/"+filename, ss)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+}

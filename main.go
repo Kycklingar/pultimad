@@ -67,7 +67,7 @@ func main() {
 
 	ypc := setupYP(conf.YiffParty)
 
-	daemon.RegisterDomain("yiff.party", ypc, conf.SleepTime)
+	daemon.RegisterDomain("yiff.party", ypc, conf.SleepTime * time.Millisecond)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT)

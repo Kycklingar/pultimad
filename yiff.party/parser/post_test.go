@@ -110,9 +110,15 @@ func TestPostParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	fmt.Println(post.ID)
 	fmt.Println(post.Title)
+	fmt.Println(post.PostTime)
 	fmt.Println(post.Body)
 	fmt.Println(post.FileURL)
 	fmt.Println(post.Attachments)
+
+	if post.Title != "Inktober 14-15" {
+		t.Fatal("Wrong title")
+	}
 }

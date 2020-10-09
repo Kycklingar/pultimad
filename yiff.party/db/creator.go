@@ -36,7 +36,7 @@ func (db *DB) CheckCreator(creator *yp.Creator) error {
 	return err
 }
 
-func (db *DB) StoreCreator(creator *yp.Creator) error {
+func (db *DB) StoreCreator(creator yp.Creator) error {
 	_, err := db.Exec(
 		"INSERT INTO creators(id, name) VALUES($1, $2) ON CONFLICT DO NOTHING",
 		creator.ID,

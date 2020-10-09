@@ -38,7 +38,8 @@ func (t dlTask) Do() []daemon.Taskif {
 
 	sum := filepath.Base(sPath)
 	filename := filepath.Base(t.file.FileURL)
-	dest := filepath.Join("download", ypDomain, t.file.Creator, fmt.Sprintf("%d-%s-%s", t.file.PostID, sum[:4], filename))
+	//dest := filepath.Join("download", ypDomain, t.file.Creator, fmt.Sprintf("%d-%s-%s", t.file.PostID, sum[:4], filename))
+	dest := filepath.Join("download", t.file.Creator, DestFilename(t.file.PostID, sum, filename))
 
 	err = fs.Link(sPath, dest)
 	if err != nil {
@@ -52,4 +53,8 @@ func (t dlTask) Do() []daemon.Taskif {
 	}
 
 	return nil
+}
+
+func DestFilename(postID int, checksum, filename string) string {
+	return fmt.Sprintf("%d-%s-%s", postID, checksum[:4], filename)
 }

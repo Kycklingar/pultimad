@@ -42,11 +42,21 @@ func Write(file io.Reader) (string, error) {
 
 }
 
+func Truncate(filename string) string {
+	if len(filename) > 256 {
+		return filename[:203] + "..." + filename[len(filename)-51:]
+	}
+
+	return filename
+}
+
 func Link(src, dest string) error {
 	var err error
 	if err = os.MkdirAll(filepath.Dir(dest), os.ModePerm); err != nil {
 		return err
 	}
+
+	dest = Truncate(dest)
 
 	err = os.Link(src, dest)
 	if err != nil {
@@ -65,9 +75,15 @@ func tmpfile(fs io.Reader) (*os.File, error) {
 		return nil, err
 	}
 	_, err = io.Copy(f, fs)
+	if err != nil {
+		f.Close()
+		os.Remove(filename)
+		return nil, err
+	}
+
 	f.Sync()
 	f.Seek(0, 0)
-	return f, err
+	return f, nil
 }
 
 func checksum(f io.Reader) (string, error) {

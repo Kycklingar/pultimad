@@ -19,19 +19,6 @@ const (
 	renderPostsURL = yiffPartyURL + "/render_posts"
 )
 
-func NewCreator(id int) (*Creator, error) {
-	var c = new(Creator)
-	c.ID = id
-
-	if Creators2 == nil {
-		return nil, errors.New("There are no creator names. Did you forget to LoadCreators()?")
-	}
-
-	c.Name = Creators2[id]
-
-	return c, nil
-}
-
 type Creator struct {
 	ID   int
 	Name string
@@ -96,9 +83,11 @@ func (c *Creator) parsePosts(body io.Reader) ([]*Post, error) {
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		log.Println("Could not find pageinate element")
 	}
 
-	cc := nd.getClasses("row yp-posts-row")
+	cc := nd.getClassesS("row yp-posts-row")
 	if len(cc) <= 0 {
 		return nil, nil
 	}

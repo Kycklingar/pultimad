@@ -32,7 +32,7 @@ func (dom *domain) process() {
 	for !dom.q {
 		task := dom.queue.pop()
 		if task != nil {
-			fmt.Printf("[%s] %s\n", task.Domain(), task.Description())
+			fmt.Printf("%s - [%s] %s\n", time.Now().Format("2006-01-02 15:04:05"), task.Domain(), task.Description())
 			newTasks := task.Do()
 			if newTasks != nil {
 				dom.queue.push(newTasks)

@@ -110,10 +110,18 @@ func (db *DB) StorePost(post *yp.Post) error {
 	}()
 
 	_, err = tx.Exec(
-		"INSERT INTO posts(creator_id, id, title, body) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING",
+		`
+			INSERT INTO posts (creator_id, id, title, post_time, body)
+			VALUES($1, $2, $3, $4, $5)
+			ON CONFLICT (id) DO UPDATE SET
+				post_time = EXCLUDED.post_time,
+				title = EXCLUDED.title,
+				body = EXCLUDED.body
+		`,
 		post.Creator.ID,
 		post.ID,
 		post.Title,
+		post.PostTime,
 		post.Body,
 	)
 	if err != nil {
